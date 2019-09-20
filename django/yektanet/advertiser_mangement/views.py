@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Advertiser, Ad
 
 # Create your views here.
@@ -9,3 +9,7 @@ def index(req):
   return render(req, 'advertiser_mangement/ads.html',{
     'advertisers' : advertiser_array,
   })
+
+def click(req, ad_id):
+  the_ad = get_object_or_404(Ad, id = ad_id)
+  return redirect(the_ad.link)
