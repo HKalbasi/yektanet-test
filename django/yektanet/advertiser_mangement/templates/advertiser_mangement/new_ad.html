@@ -1,0 +1,20 @@
+<html>
+  <head>
+    
+  </head>
+  <body>
+    {% if error_message %}
+      <p style="color: red">
+        <strong>{{ error_message }}</strong>
+      </p>
+    {% endif %}
+    <form method="POST">
+      {% csrf_token %}
+      owner_id: <input name = "owner_id"  type="text"> <br>
+      title:    <input name = "title"     type="text"> <br>
+      image_url:<input name = "image_url" type="text"> <br>
+      link:     <input name = "link"      type="text"> <br>
+      <input type="submit">
+    </form>
+  </body>
+</html>

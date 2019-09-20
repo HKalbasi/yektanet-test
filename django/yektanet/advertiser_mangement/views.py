@@ -14,3 +14,21 @@ def click(req, ad_id):
   the_ad = get_object_or_404(Ad, id = ad_id)
   the_ad.incClicks()
   return redirect(the_ad.link)
+
+def new_ad(req):
+  if req.method == 'POST':
+    try:
+      owner = Advertiser.objects.get(id = req.POST['owner_id'])
+      Ad.objects.create(
+        title  = req.POST['title'],
+        owner  = owner,
+        imgUrl = req.POST['image_url'],
+        link   = req.POST['link'],
+      )
+      return redirect('/')
+    except Exception as e:
+      return render(req, 'advertiser_mangement/new_ad.html', {
+        'error_message': 'Error ' + repr(e),
+      })
+  else:
+    return render(req, 'advertiser_mangement/new_ad.html')
