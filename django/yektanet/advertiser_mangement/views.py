@@ -12,4 +12,5 @@ def index(req):
 
 def click(req, ad_id):
   the_ad = get_object_or_404(Ad, id = ad_id)
+  the_ad.incClicks()
   return redirect(the_ad.link)
