@@ -12,7 +12,7 @@ def index(req):
 
 def click(req, ad_id):
   the_ad = get_object_or_404(Ad, id = ad_id)
-  the_ad.incClicks()
+  the_ad.incClicks(req.META['REMOTE_ADDR'])
   return redirect(the_ad.link)
 
 def new_ad(req):
