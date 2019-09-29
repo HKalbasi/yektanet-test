@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Advertiser, Ad
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 
 # Create your views here.
-class Index(TemplateView):
+class IndexView(TemplateView):
   template_name = "advertiser_mangement/ads.html"
 
   def get_context_data(self, **kwargs):
@@ -14,10 +14,11 @@ class Index(TemplateView):
     context['advertisers'] = advertiser_array
     return context
 
-def click(req, ad_id):
-  the_ad = get_object_or_404(Ad, id = ad_id)
-  the_ad.incClicks(req.META['REMOTE_ADDR'])
-  return redirect(the_ad.link)
+class ClickView(RedirectView):
+  def get_redirect_url(self, ad_id):
+    the_ad = get_object_or_404(Ad, id = ad_id)
+    the_ad.incClicks(self.request.META['REMOTE_ADDR'])
+    return the_ad.link
 
 def new_ad(req):
   if req.method == 'POST':
@@ -37,3 +38,10 @@ def new_ad(req):
   else:
     return render(req, 'advertiser_mangement/new_ad.html')
 
+class AdminApprove(TemplateView):
+  template_name = "advertiser_mangement/admin_approve.html"
+
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    context['context'] = kwargs
+    return context
