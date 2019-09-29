@@ -8,7 +8,15 @@ class Ad(models.Model):
   imgUrl = models.CharField(max_length=1000, null = False)
   link   = models.CharField(max_length=1000, null = False)
   owner  = models.ForeignKey(Advertiser, null = False, on_delete=models.CASCADE)
-  
+  approved = models.CharField(
+    max_length=2,
+    default='PE',
+    choices=(
+      ('PE','pending'),
+      ('RJ','rejected'),
+      ('OK','approved'),
+    )
+  )
   def incClicks(self, ip):
     click = Click.objects.create(ip=ip, owner=self)
 

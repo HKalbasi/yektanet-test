@@ -40,8 +40,6 @@ def new_ad(req):
 
 class AdminApprove(TemplateView):
   template_name = "advertiser_mangement/admin_approve.html"
-
   def get_context_data(self, **kwargs):
-    context = super().get_context_data(**kwargs)
-    context['context'] = kwargs
+    context['ads'] = Ad.objects.filter(approved = False).all()
     return context
