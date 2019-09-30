@@ -9,6 +9,44 @@
         title: <span>{{ ad.title }}</span><br>
         owner: <span>{{ ad.owner }}</span><br>
         average of distance between view and click: <span>{{ ad.dis_av }}</span><br>
+        rate: <span>{{ ad.rate }}</span>
+        <table>
+          <tbody>
+            <tr>
+              <td>hour(UTC)</td>
+              {% for x in ad.table %}
+                <td>
+                  {{ x.time }}
+                </td>
+              {% endfor %}
+            </tr>
+            <tr>
+                <td>clicks</td>
+                {% for x in ad.table %}
+                  <td>
+                    {{ x.clicks }}
+                  </td>
+                {% endfor %}
+              </tr>
+            <tr>
+              <td>views</td>
+              {% for x in ad.table %}
+                <td>
+                  {{ x.views }}
+                </td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>average</td>
+              {% for x in ad.table %}
+                <td>
+                  {{ x.average }}
+                </td>
+              {% endfor %}
+            </tr>
+              
+          </tbody>
+        </table>
       </div>
     </div>
     {% endfor %}

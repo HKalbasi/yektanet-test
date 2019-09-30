@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Advertiser, Ad
-from django.views.generic.base import TemplateView, RedirectView, View
+from .models import Advertiser, Ad, Click, View
+from django.views.generic.base import TemplateView, RedirectView, View as ClassView
+from datetime import datetime, timedelta
 
 # Create your views here.
 class IndexView(TemplateView):
@@ -10,7 +11,9 @@ class IndexView(TemplateView):
     context = super().get_context_data(**kwargs)
     advertiser_array = Advertiser.objects.order_by('-name')
     for advertiser in advertiser_array:
-      advertiser.ads = Ad.objects.filter(approved = 'OK', owner = advertiser)  
+      advertiser.ads = Ad.objects.filter(approved = 'OK', owner = advertiser)
+      for ad in advertiser.ads:
+        ad.incViews(self.request.META['REMOTE_ADDR'])
     context['advertisers'] = advertiser_array
     return context
 
@@ -45,6 +48,29 @@ class ReportView(TemplateView):
     context = super().get_context_data(**kwargs)
     ads = Ad.objects.all()
     for ad in ads:
-      ad.dis_av = 5
+      clicks = Click.objects.filter(owner = ad)
+      views = View.objects.filter(owner = ad)
+      diff = 0
+      for click in clicks:
+        view =  views.filter(ip = click.ip, time__lt = click.time).order_by('-time').first()
+        if view == None:
+          raise "what?"
+        else:
+          diff += (click.time - view.time).total_seconds()
+      tt = datetime.today()
+      ad.table = []
+      for x in range(24):
+        nt = tt - timedelta(hours=1)
+        cc = clicks.filter(time__gt = nt , time__lt = tt).count()
+        cv = views.filter(time__gt  = nt , time__lt = tt).count()
+        ad.table.append({
+          'time'    : tt.hour,
+          'clicks'  : cc,
+          'views'   : cv,
+          'average' : cc/max(cv,1)
+        })
+        tt = nt
+      ad.dis_av = diff / max(clicks.count(),1)
+      ad.rate = clicks.count() / max(views.count(),1)
     context['ads'] = ads
     return context

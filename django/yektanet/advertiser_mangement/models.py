@@ -21,6 +21,8 @@ class Ad(models.Model):
   )
   def __str__(self):
     return self.title + '(' + str(self.owner) + ')'
+  def incViews(self, ip):
+    click = View.objects.create(ip=ip, owner=self)
   def incClicks(self, ip):
     click = Click.objects.create(ip=ip, owner=self)
 
@@ -28,8 +30,12 @@ class Click(models.Model):
   time   = models.DateTimeField(auto_now=True)
   ip     = models.CharField(max_length=15)
   owner  = models.ForeignKey(Ad, null = False, on_delete=models.CASCADE)
+  def __str__(self):
+    return str(self.owner) + ' at ' + str(self.time)
 
 class View(models.Model):
   time   = models.DateTimeField(auto_now=True)
   ip     = models.CharField(max_length=15)
   owner  = models.ForeignKey(Ad, null = False, on_delete=models.CASCADE)
+  def __str__(self):
+    return str(self.owner) + ' at ' + str(self.time)
