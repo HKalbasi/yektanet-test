@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Advertiser, Ad, Click, View
 from django.views.generic.base import TemplateView, RedirectView, View as ClassView
 from datetime import datetime, timedelta
+from django.http import Http404
 
 # Create your views here.
 class IndexView(TemplateView):
@@ -23,8 +24,8 @@ class ClickView(RedirectView):
     the_ad.incClicks(self.request.META['REMOTE_ADDR'])
     return the_ad.link
 
-def new_ad(req):
-  if req.method == 'POST':
+class NewAdView(ClassView):
+  def post(self, req):
     try:
       owner = Advertiser.objects.get(id = req.POST['owner_id'])
       Ad.objects.create(
@@ -38,13 +39,15 @@ def new_ad(req):
       return render(req, 'advertiser_mangement/new_ad.html', {
         'error_message': 'Error ' + repr(e),
       })
-  else:
+  def get(self, req):
     return render(req, 'advertiser_mangement/new_ad.html')
 
 class ReportView(TemplateView):
   template_name = "advertiser_mangement/report.html"
 
   def get_context_data(self, **kwargs):
+    if not self.request.user.is_staff:
+      raise Http404()
     context = super().get_context_data(**kwargs)
     ads = Ad.objects.all()
     for ad in ads:
