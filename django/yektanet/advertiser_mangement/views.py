@@ -14,14 +14,14 @@ class IndexView(TemplateView):
     for advertiser in advertiser_array:
       advertiser.ads = Ad.objects.filter(approved = 'OK', owner = advertiser)
       for ad in advertiser.ads:
-        ad.incViews(self.request.META['REMOTE_ADDR'])
+        ad.incViews(self.request.IP)
     context['advertisers'] = advertiser_array
     return context
 
 class ClickView(RedirectView):
   def get_redirect_url(self, ad_id):
     the_ad = get_object_or_404(Ad, id = ad_id)
-    the_ad.incClicks(self.request.META['REMOTE_ADDR'])
+    the_ad.incClicks(self.request.IP)
     return the_ad.link
 
 class NewAdView(ClassView):
