@@ -1,0 +1,16 @@
+<html>
+  <head>
+
+  </head>
+  <body>
+    {% for ad in ads %}
+    <div>
+      <div style="border:1px solid black; margin: 2px">
+        title: <span>{{ ad.title }}</span><br>
+        owner: <span>{{ ad.owner }}</span><br>
+        average of distance between view and click: <span>{{ ad.dis_av }}</span><br>
+      </div>
+    </div>
+    {% endfor %}
+  </body>
+</html>

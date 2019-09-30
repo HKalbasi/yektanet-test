@@ -2,6 +2,8 @@ from django.db import models
 
 class Advertiser(models.Model):
   name   = models.CharField(max_length=100, null = False)
+  def __str__(self):
+    return self.name
 
 class Ad(models.Model):
   title  = models.CharField(max_length=100, null = False)
@@ -17,6 +19,8 @@ class Ad(models.Model):
       ('OK','approved'),
     )
   )
+  def __str__(self):
+    return self.title + '(' + str(self.owner) + ')'
   def incClicks(self, ip):
     click = Click.objects.create(ip=ip, owner=self)
 

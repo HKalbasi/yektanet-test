@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Advertiser, Ad
-from django.views.generic.base import TemplateView, RedirectView
+from django.views.generic.base import TemplateView, RedirectView, View
 
 # Create your views here.
 class IndexView(TemplateView):
@@ -10,7 +10,7 @@ class IndexView(TemplateView):
     context = super().get_context_data(**kwargs)
     advertiser_array = Advertiser.objects.order_by('-name')
     for advertiser in advertiser_array:
-      advertiser.ads = Ad.objects.filter(owner = advertiser)  
+      advertiser.ads = Ad.objects.filter(approved = 'OK', owner = advertiser)  
     context['advertisers'] = advertiser_array
     return context
 
@@ -38,8 +38,13 @@ def new_ad(req):
   else:
     return render(req, 'advertiser_mangement/new_ad.html')
 
-class AdminApprove(TemplateView):
-  template_name = "advertiser_mangement/admin_approve.html"
+class ReportView(TemplateView):
+  template_name = "advertiser_mangement/report.html"
+
   def get_context_data(self, **kwargs):
-    context['ads'] = Ad.objects.filter(approved = False).all()
+    context = super().get_context_data(**kwargs)
+    ads = Ad.objects.all()
+    for ad in ads:
+      ad.dis_av = 5
+    context['ads'] = ads
     return context
