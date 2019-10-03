@@ -1,0 +1,17 @@
+<html>
+  <head>
+
+  </head>
+  <body>
+    شروع: <input id="start-date" type="date"><input id="start-hour" type="text"><br>
+    پایان: <input id="end-date" type="date"><input id="end-hour" type="text"><br>
+    <button id="go">بزن بریم</button>
+    <script>
+      document.getElementById('go').onclick = () => {
+        const st = document.getElementById('start-date').value + '-' + document.getElementById('start-hour').value.padStart(2,'0');
+        const en = document.getElementById(  'end-date').value + '-' + document.getElementById(  'end-hour').value.padStart(2,'0');
+        window.location = `/report/?start=${st}&end=${en}`;
+      }
+    </script>
+  </body>
+</html>

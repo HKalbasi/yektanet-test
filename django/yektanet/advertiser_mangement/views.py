@@ -42,14 +42,22 @@ class NewAdView(ClassView):
   def get(self, req):
     return render(req, 'advertiser_mangement/new_ad.html')
 
-class ReportView(TemplateView):
-  template_name = "advertiser_mangement/report.html"
-
+class ReportSelectTimeView(TemplateView):
+  template_name = "advertiser_mangement/report-select-time.html"
   def get_context_data(self, **kwargs):
     if not self.request.user.is_staff:
       raise Http404()
-    context = super().get_context_data(**kwargs)
+
+class ReportView(ClassView):
+  def get(self, req):
+    if not req.user.is_staff:
+      raise Http404()
     ads = Ad.objects.all()
+    try:
+      start = datetime.strptime(req.GET['start'],"%Y-%m-%d-%H")
+      end   = datetime.strptime(req.GET['end'],"%Y-%m-%d-%H")
+    except Exception as e:
+      return redirect('/report/select_time/')
     for ad in ads:
       clicks = Click.objects.filter(owner = ad)
       views = View.objects.filter(owner = ad)
@@ -60,12 +68,12 @@ class ReportView(TemplateView):
           raise "what?"
         else:
           diff += (click.time - view.time).total_seconds()
-      tt = datetime.today()
+      tt = start
       ad.table = []
-      for x in range(24):
-        nt = tt - timedelta(hours=1)
-        cc = clicks.filter(time__gt = nt , time__lt = tt).count()
-        cv = views.filter(time__gt  = nt , time__lt = tt).count()
+      while tt < end:
+        nt = tt + timedelta(hours=1)
+        cc = clicks.filter(time__lt = nt , time__gt = tt).count()
+        cv = views .filter(time__lt = nt , time__gt = tt).count()
         ad.table.append({
           'time'    : tt.hour,
           'clicks'  : cc,
@@ -75,5 +83,6 @@ class ReportView(TemplateView):
         tt = nt
       ad.dis_av = diff / max(clicks.count(),1)
       ad.rate = clicks.count() / max(views.count(),1)
-    context['ads'] = ads
-    return context
+    return render (req, "advertiser_mangement/report.html",{
+      "ads": ads
+    })
