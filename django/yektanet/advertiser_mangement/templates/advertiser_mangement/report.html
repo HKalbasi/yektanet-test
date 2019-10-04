@@ -3,9 +3,10 @@
 
   </head>
   <body>
-    {% for ad in ads %}
+    {% for id, ad in res.items %}
     <div>
       <div style="border:1px solid black; margin: 2px">
+        {{ body }}
         title: <span>{{ ad.title }}</span><br>
         owner: <span>{{ ad.owner }}</span><br>
         average of distance between view and click: <span>{{ ad.dis_av }}</span><br>
