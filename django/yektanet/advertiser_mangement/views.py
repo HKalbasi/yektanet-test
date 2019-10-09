@@ -61,24 +61,13 @@ class ReportView(ClassView):
       return redirect('/report/select_time/')
     res = {}
     for ad in ads:
-      clicks = Click.objects.filter(owner = ad)
-      views = View.objects.filter(owner = ad)
-      diff = 0
-      for click in clicks:
-        view =  views.filter(ip = click.ip, time__lt = click.time).order_by('-time').first()
-        if view == None:
-          raise "what?"
-        else:
-          diff += (click.time - view.time).total_seconds()
-      ad.dis_av = diff / max(clicks.count(),1)
-    clickCount = Click.objects.values('owner').annotate(count=Count('id'))
-    viewCount  = View .objects.values('owner').annotate(count=Count('id'))
-    for ad in ads:
       res[ad.id] = { 'table' : [], 'title': ad.title, 'click_count': 0, 
         'view_count': 0, 
         'rate': '-',
-        'dis_av': ad.dis_av,
+        'dis_av': '-',
       }
+    clickCount = Click.objects.values('owner').annotate(count=Count('id'))
+    viewCount  = View .objects.values('owner').annotate(count=Count('id'))
     for cc in clickCount:
       res[cc['owner']]['click_count'] = cc['count']
     for vc in viewCount:
@@ -95,10 +84,26 @@ class ReportView(ClassView):
         res[x['owner']]['table'][-1]['clicks'] = x['count']
       for x in cv:
         res[x['owner']]['table'][-1]['views'] = x['count']
-        res[x['owner']]['table'][-1]['average'] = res[x['owner']]['table'][-1]['clicks']/x['count']
-        
+        res[x['owner']]['table'][-1]['average'] = res[x['owner']]['table'][-1]['clicks']/x['count']    
       tt = nt
+    dis_av_all = Ad.objects.raw(
+      """
+      SELECT owner_id as id, AVG(diff) as diff
+      FROM (
+        SELECT 
+          a.id, 
+          a.owner_id, 
+          (JulianDay(a.time)-JulianDay(MAX(b.time)))*24*60*60 as diff 
+        FROM advertiser_mangement_click as a 
+        INNER JOIN advertiser_mangement_view as b 
+        ON a.ip = b.ip AND a.time > b.time AND a.owner_id = b.owner_id 
+        GROUP BY a.id
+      ) 
+      GROUP BY owner_id;
+      """
+    )
+    for x in dis_av_all:
+      res[x.id]['dis_av'] = x.diff
     return render (req, "advertiser_mangement/report.html",{
-      "ads": ads,
       "res": res,
     })
