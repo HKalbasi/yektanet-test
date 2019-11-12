@@ -10,5 +10,6 @@ router.register('ad', AdViewSet)
 
 urlpatterns = [
   path('api-auth/', include('rest_framework.urls')),
+  path('report/<startString>/<endString>/', ReportView.as_view()),
   path('', include(router.urls)),
 ]
