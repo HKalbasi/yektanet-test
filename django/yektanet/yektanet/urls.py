@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
+from advertiser_mangement.rest import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('advertiser_mangement.urls')),
+    path('api-auth/', include('rest_framework.urls')),
+    path('', include(router.urls)),
 ]
