@@ -20,6 +20,7 @@ class AdvertiserViewSet(viewsets.ModelViewSet):
   serializer_class = AdvertiserSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
+  permission_classes = [permissions.IsAdminUser]
   queryset = User.objects.all()
   serializer_class = UserSerializer
 
