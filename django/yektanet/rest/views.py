@@ -77,4 +77,16 @@ class ReportView(APIView):
     )
     for x in dis_av_all:
       res[x.id]['dis_av'] = x.diff
-    return Response(res)
+    response = []
+    for i in res:
+      x = {
+        "id": req.scheme+"://"+req.get_host()+"/rest/ad/"+str(i),
+        "title": res[i]["title"],
+        "click_count": res[i]["click_count"],
+        "view_count": res[i]["view_count"],
+        "rate": res[i]["rate"],
+        "dis_av": res[i]["dis_av"],
+        "hour_statistics": res[i]["table"],
+      }
+      response.append(x)
+    return Response(response)
